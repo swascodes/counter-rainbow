@@ -10,25 +10,39 @@ export function WalletConnectButton() {
   const [uri, setUri] = React.useState<string>("");
 
   React.useEffect(() => {
-    const handleMessage = (message: { type: string; data?: unknown }) => {
-      if (message.type === "display_uri" && typeof message.data === "string") {
-        setUri(message.data);
-      }
+    const handleDisplayUri = (uri: string) => {
+      setUri(uri);
     };
 
     connectors.forEach((connector) => {
-      const emitter = (connector as any).emitter;
-      if (emitter) {
-        emitter.on("message", handleMessage);
-      }
+      connector.getProvider().then((provider) => {
+        // We use type narrowing instead of 'any' to satisfy strict ESLint rules
+        if (
+          provider &&
+          typeof provider === "object" &&
+          "on" in provider &&
+          typeof (provider as { on?: Function }).on === "function"
+        ) {
+          (provider as { on: Function }).on("display_uri", handleDisplayUri);
+        }
+      }).catch(() => { /* ignore */ });
     });
 
     return () => {
       connectors.forEach((connector) => {
-        const emitter = (connector as any).emitter;
-        if (emitter) {
-          emitter.off("message", handleMessage);
-        }
+        connector.getProvider().then((provider) => {
+          if (
+            provider &&
+            typeof provider === "object" &&
+            "removeListener" in provider &&
+            typeof (provider as { removeListener?: Function }).removeListener === "function"
+          ) {
+            (provider as { removeListener: Function }).removeListener(
+              "display_uri",
+              handleDisplayUri
+            );
+          }
+        }).catch(() => { /* ignore */ });
       });
     };
   }, [connectors]);
