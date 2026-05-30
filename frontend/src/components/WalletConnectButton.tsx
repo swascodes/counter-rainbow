@@ -21,9 +21,9 @@ export function WalletConnectButton() {
           provider &&
           typeof provider === "object" &&
           "on" in provider &&
-          typeof (provider as { on?: Function }).on === "function"
+          typeof (provider as { on?: (...args: unknown[]) => unknown }).on === "function"
         ) {
-          (provider as { on: Function }).on("display_uri", handleDisplayUri);
+          (provider as { on: (event: string, handler: (uri: string) => void) => void }).on("display_uri", handleDisplayUri);
         }
       }).catch(() => { /* ignore */ });
     });
@@ -35,9 +35,9 @@ export function WalletConnectButton() {
             provider &&
             typeof provider === "object" &&
             "removeListener" in provider &&
-            typeof (provider as { removeListener?: Function }).removeListener === "function"
+            typeof (provider as { removeListener?: (...args: unknown[]) => unknown }).removeListener === "function"
           ) {
-            (provider as { removeListener: Function }).removeListener(
+            (provider as { removeListener: (event: string, handler: (uri: string) => void) => void }).removeListener(
               "display_uri",
               handleDisplayUri
             );
@@ -113,6 +113,7 @@ export function WalletConnectButton() {
                           }}
                         >
                           {chain.iconUrl && (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                               alt={chain.name ?? "Chain icon"}
                               src={chain.iconUrl}
