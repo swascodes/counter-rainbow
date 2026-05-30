@@ -17,19 +17,17 @@ export function WalletConnectButton() {
     };
 
     connectors.forEach((connector) => {
-      // @ts-expect-error wagmi v2 internal emitter
-      if (connector.emitter) {
-        // @ts-expect-error wagmi v2 internal emitter
-        connector.emitter.on("message", handleMessage);
+      const emitter = (connector as any).emitter;
+      if (emitter) {
+        emitter.on("message", handleMessage);
       }
     });
 
     return () => {
       connectors.forEach((connector) => {
-        // @ts-expect-error wagmi v2 internal emitter
-        if (connector.emitter) {
-          // @ts-expect-error wagmi v2 internal emitter
-          connector.emitter.off("message", handleMessage);
+        const emitter = (connector as any).emitter;
+        if (emitter) {
+          emitter.off("message", handleMessage);
         }
       });
     };
