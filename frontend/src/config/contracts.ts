@@ -1,4 +1,4 @@
-export const COUNTER_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+export const COUNTER_CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0x42b1227Fd88C007bE82F5F3762ed4AE570542522") as `0x${string}`;
 
 export const COUNTER_ABI = [
   {
